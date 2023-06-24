@@ -15,28 +15,47 @@ FATE_CHART = [
 
 #roll on the mythic fate chart
 def main():
-    chaos_factor = int(os.environ['ESPANSO_DICE'])
+    chaos_factor = int(os.environ['ESPANSO_CHAOS'])
     odds = os.environ['ESPANSO_ODDS']
+    #chaos_factor = "5"
+    #odds = "I"
 
-    # if odds are passed in as a string, attempt to parse it into an int
-    if isinstance(odds, str):
-        odds = convertOdds(odds)
+    chaosFactorInt = int(chaos_factor)
+    #oddsInt = int(odds)
+
+    # if odds are not an int, convert to int
+    try:
+        oddsInt = int(odds)
+    except ValueError:
+        oddsInt = convertOdds(odds)
 
     # minus one to iputs to account for zero indexing
-    chaos_factor -= 1
-    odds -= 1
+    chaosFactorInt -= 1
+    oddsInt -= 1
 
     # check bounds of inputs
-    if chaos_factor < 0 or chaos_factor > 9:
-        raise ValueError('Invalid chaos factor: ' + chaos_factor)
+    if chaosFactorInt < 0 or chaosFactorInt > 9:
+        raise ValueError('Invalid chaos factor: ' + chaosFactorInt)
     
-    if odds < 0 or odds > 9:
-        raise ValueError('Invalid odds: ' + odds)
+    if oddsInt < 0 or oddsInt > 9:
+        raise ValueError('Invalid odds: ' + oddsInt)
      
     diceRoll = random.randint(1, 100)
 
     #get fate chart element to use based on inputs
-    fateCell = FATE_CHART[chaos_factor][odds]
+    fateCell = FATE_CHART[chaosFactorInt][oddsInt]
+
+    #convert roll to "Exceptional Yes", "Yes", "No", or "Exceptional No"
+    if diceRoll <= fateCell[0]:
+        result = "Exceptional Yes"
+    elif diceRoll <= fateCell[1]:
+        result = "Yes"
+    elif diceRoll <= fateCell[2]:
+        result = "No"
+    else:
+        result = "Exceptional No"
+
+    print(str(diceRoll) + ' : ' + result)
 
 def convertOdds(odds):
     if odds in ['Impossible', 'I']:
@@ -58,7 +77,7 @@ def convertOdds(odds):
     elif odds in ['A Sure Thing', 'ST', 'Sure Thing', 'S', 'Certain', 'C']:
         return 9
     else:
-        raise ValueError('Invalid odds: ' + odds)
+        raise ValueError('Cannot convert odds: ' + odds)
 
 if __name__ == "__main__":
     main()

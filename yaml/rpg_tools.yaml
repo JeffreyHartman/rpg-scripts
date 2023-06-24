@@ -1,0 +1,19 @@
+  - regex: ":roll(?P<dice>.*)\\."
+    replace: "{{output}}"
+    vars:
+      - name: output
+        type: script
+        params:
+          args:
+            - python
+            - /Users/it/rpg-scripts/pythondice.py
+
+  - regex: ":fate((?P<chaos>,P<odds>))\\)"
+    replace: "{{output}}"
+    vars:
+      - name: output
+        type: script
+        params:
+          args:
+            - python
+            - /Users/it/rpg-scripts/mythic2e/fatechart.py
