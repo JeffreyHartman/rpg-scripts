@@ -8,7 +8,7 @@
             - python
             - /Users/it/rpg-scripts/pythondice.py
 
-  - regex: ":fate((?P<chaos>,P<odds>))\\)"
+  - regex: ":fate\\((?P<chaos>.*?),(?P<odds>.*?)\\)"
     replace: "{{output}}"
     vars:
       - name: output
