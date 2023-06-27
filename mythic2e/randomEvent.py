@@ -19,19 +19,25 @@ EVENT_FOCUS_TABLE = [
 
 def main():
     parser = argparse.ArgumentParser(description='Generate a random event.')
-    parser.add_argument('action', nargs='?', default='descriptor', help='generate a random event')
+    parser.add_argument('action', nargs='?', default='random_element', help='random_event, focus, action, description, list_element_tables, random_element')
+    parser.add_argument('--element', default='noblehouse', help='roll on the specified element table')
     args = parser.parse_args()
 
-    
     if args.action == 'random_event':
         print(generateRandomEvent())
     elif args.action == 'focus':
         print('Event Focus: ' + generateEventFocus())
     elif args.action == 'action':
         print('Action: ' + generateAction())
-    elif args.action == 'descriptor':
-        print('Descriptor: ' + generateDescriptor())
-
+    elif args.action == 'description':
+        print('Description: ' + generateDescriptor())
+    elif args.action == 'list_element_tables':
+        fileList = listElementTables()
+        print('Element Tables: ' + ', '.join(fileList))
+        #for file in fileList:
+         #   print(file)
+    elif args.action == 'random_element':
+        print(getFileHeader(args.element) + ': ' + generateElements(args.element))
 
 def generateRandomEvent():
     eventFocus = generateEventFocus()
@@ -50,50 +56,65 @@ def generateEventFocus():
     return eventFocus
 
 def generateAction():
-    # roll randomly and read that line number from action1.txt in tables folder
-    dieRoll = random.randint(1, 100)
-
-    content = openFile("action1.txt")
-    word1 = content[dieRoll - 1]
-    word1 = word1.replace('\n', '')
-
-    content = None
-    dieRoll = random.randint(1, 100)
-
-    content = openFile('action2.txt')
-    word2 = content[dieRoll - 1]
-    word2 = word2.replace('\n', '')
-
-    return word1 + ' ' + word2
+    return getRandomWordFromFile('action1.txt') + ' ' + getRandomWordFromFile('action2.txt')    
 
 def generateDescriptor():
-    dieRoll = random.randint(1, 100)
+    return getRandomWordFromFile('descriptor1.txt') + ' ' + getRandomWordFromFile('descriptor2.txt')
 
-    content = openFile("descriptor1.txt")
-    word1 = content[dieRoll - 1]
-    word1 = word1.replace('\n', '')
+def generateElements(element):
+    return getRandomWordFromFile('elements/' + element + '.txt') + ' ' + getRandomWordFromFile('elements/' + element + '.txt')
 
-    content = None
-    dieRoll = random.randint(1, 100)
+def listElementTables():
+    # list all the tables in the tables/mythic2e/elements directory
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    filepath = os.path.join(parent_dir, "tables/mythic2e/elements")
 
-    content = openFile('descriptor2.txt')
-    word2 = content[dieRoll - 1]
-    word2 = word2.replace('\n', '')
+    fileList = []
 
-    return word1 + ' ' + word2
+    for filename in os.listdir(filepath):
+        fileParts = filename.split('.')
+        fileList.append(fileParts[0])
+    fileList.sort()
+
+    return fileList
+
+def getFileHeader(filename):
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    filepath = os.path.join(parent_dir, "tables/mythic2e/elements", filename + '.txt')
+
+    try:
+        with open(filepath, 'r') as f:
+            # Read the first line as the header
+            header = f.readline().replace('\n', '')
+            # Strip the # from the header
+            header = header[2:]
+    except FileNotFoundError:
+        raise FileNotFoundError('File not found: ' + filepath)
+    
+    return header
 
 def openFile(filename):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(current_dir)
-    filepath = os.path.join(parent_dir, "tables", filename)
-    
+    filepath = os.path.join(parent_dir, "tables/mythic2e", filename)
+
     try:
         with open(filepath, 'r') as f:
+            # Read the first line as the header and ignore it
+            header = f.readline()
             content = f.readlines()
     except FileNotFoundError:
         raise FileNotFoundError('File not found: ' + filepath)
     
     return content
+
+def getRandomWordFromFile(filename):
+    content = openFile(filename)
+    dieRoll = random.randint(1, len(content))  # Adjust the die roll to the size of the content
+    word = content[dieRoll - 1].replace('\n', '')
+    return word
 
 if __name__ == "__main__":
     main()
