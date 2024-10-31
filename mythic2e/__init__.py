@@ -1,1 +1,0 @@
-from .fatechart import fate_check

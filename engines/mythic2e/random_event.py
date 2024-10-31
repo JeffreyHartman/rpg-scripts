@@ -1,6 +1,5 @@
-import os
 import random
-from mythic2e.utils import get_random_word
+from .utils import get_random_word, get_element_tables
 
 EVENT_FOCUS_TABLE = [
     (range(1, 6), "Remote Event"),
@@ -36,8 +35,8 @@ def _generate_action() -> str:
 def generate_descriptor() -> str:
     return f"{get_random_word('descriptor1.txt')} {get_random_word('descriptor2.txt')}"
 
-def list_element_tables() -> list[str]:
-    list_element_tables()
+def list_elements() -> list[str]:
+    return get_element_tables()
 
 def generate_element(element: str) -> str:
     return f"{get_random_word('elements/' + element + '.txt')} {get_random_word('elements/' + element + '.txt')}"

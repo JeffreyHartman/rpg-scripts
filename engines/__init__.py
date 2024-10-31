@@ -1,0 +1,1 @@
+AVAILABLE_ENGINES = ['mythic2e', 'mythic1e']

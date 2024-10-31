@@ -1,0 +1,1 @@
+from .mythic2e_menu import Mythic2eMenu
