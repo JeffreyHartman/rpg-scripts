@@ -1,7 +1,8 @@
-# ui/ascii_components.py
+# console/ascii_components.py
 import os
 import shutil
 from typing import List, Dict, Optional
+from .menu_base import MenuBase
 
 class ASCIIComponents:
     # Box drawing characters
