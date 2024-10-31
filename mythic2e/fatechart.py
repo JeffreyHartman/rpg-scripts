@@ -1,4 +1,3 @@
-import os
 import random
 
 FATE_CHART = [
@@ -14,46 +13,26 @@ FATE_CHART = [
 ]
 
 #roll on the mythic fate chart
-def main():
-    randomEvent = None
-    
-    # attmpet to get variables from environment, else get from console
-    try:
-        chaos_factor = int(os.environ['ESPANSO_CHAOS'])
-        odds = os.environ['ESPANSO_ODDS']
-    except KeyError:
-        chaos_factor = input("Chaos Factor: ")
-        odds = input("Odds: ")
-
-    try:
-        chaosFactorInt = int(chaos_factor)
-    except ValueError:
-        raise ValueError('Invalid chaos factor: ' + chaos_factor)
-
-    # if odds are not an int, convert to int
-    try:
-        oddsInt = int(odds)
-    except ValueError:
-        oddsInt = convertOdds(odds)
-
+def fate_check(chaos_factor, odds):
+    randomEvent = False
     # minus one to iputs to account for zero indexing
-    chaosFactorInt -= 1
-    oddsInt -= 1
+    chaos_factor -= 1
+    odds -= 1
 
     # check bounds of inputs
-    if chaosFactorInt < 0 or chaosFactorInt > 9:
-        raise ValueError('Invalid chaos factor: ' + chaosFactorInt)
+    if chaos_factor < 0 or chaos_factor > 9:
+        raise ValueError('Invalid chaos factor: ' + chaos_factor)
     
-    if oddsInt < 0 or oddsInt > 9:
-        raise ValueError('Invalid odds: ' + oddsInt)
+    if odds < 0 or odds > 9:
+        raise ValueError('Invalid odds: ' + odds)
      
     diceRoll = random.randint(1, 100)
 
     # get fate chart element to use based on inputs
     try:
-        fateCell = FATE_CHART[chaosFactorInt][oddsInt]
+        fateCell = FATE_CHART[chaos_factor][odds]
     except IndexError:
-        raise ValueError('Invalid chaos factor: ' + str(chaosFactorInt) + ' or odds: ' + str(oddsInt))
+        raise ValueError('Invalid chaos factor: ' + str(chaos_factor) + ' or odds: ' + str(odds))
 
     #convert roll to "Exceptional Yes", "Yes", "No", or "Exceptional No"
     if diceRoll <= fateCell[0]:
@@ -67,7 +46,7 @@ def main():
 
     # f we get a double number die roll (11, 22, 33, etc.) whose digit (1 for 11,
     # 2 for 22, etc.) is equal to or less than the Chaos Factor, then a Random Event occurs.
-    if diceRoll % 11 == 0 and diceRoll // 11 <= chaosFactorInt:
+    if diceRoll % 11 == 0 and diceRoll // 11 <= chaos_factor:
         # call the random event script
         randomEvent = True
     
@@ -77,7 +56,7 @@ def main():
     if randomEvent:
         result = result + '\n' + 'Random Event!'
 
-    print(result)
+    return result
 
 def convertOdds(odds):
     if odds in ['Impossible', 'I']:
@@ -100,6 +79,3 @@ def convertOdds(odds):
         return 9
     else:
         raise ValueError('Cannot convert odds: ' + odds)
-
-if __name__ == "__main__":
-    main()
