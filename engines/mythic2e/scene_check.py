@@ -1,5 +1,5 @@
 import random
-import argparse
+import random_event
 
 SCENE_ADJUSTMENT_TABLE = [
     (1, "Remove a Character"),
@@ -14,32 +14,31 @@ SCENE_ADJUSTMENT_TABLE = [
     (10, "Make 2 Adjustments")
 ]
 
-def main():
-    parser = argparse.ArgumentParser(description='Generate a random event.')
-    parser.add_argument('action', nargs='?', default='scene_check', help='scene_check|scene_adjustment')
-    parser.add_argument('--chaos', type=int, nargs='?', default='5', help='chaos factor')
-    args = parser.parse_args()
-
-    if args.action == 'scene_check':
-        dieRoll = random.randint(1, 10)
-        print("Scene Check: " + sceneCheck(args.chaos, dieRoll) + " (" + str(dieRoll) + ")")
-    elif args.action == 'scene_adjustment':
-        print("Scene Adjustment: " + sceneAdjustment(args.chaos))
-
-def sceneAdjustment(chaosFactorInt):
-    dieRoll = random.randint(1, 10)
-    for pos, result in SCENE_ADJUSTMENT_TABLE:
-        if dieRoll == pos:
-            return result
+def generate_scene_check(chaos_factor: int) -> str:
+    """Generate a scene check result based on chaos factor."""
+    die_roll = random.randint(1, 10)
+    result = _check_scene(chaos_factor, die_roll)
     
-def sceneCheck(chaosFactorInt, dieRoll):
-    if dieRoll <= chaosFactorInt:
-        if dieRoll % 2 == 0:
-            return "Interrupt Scene!"
-        else:
-            return "Altered Scene!"
-    else:
-        return "Normal Scene"
+    # If scene is altered or interrupted, add an adjustment
+    if result == "Interrupt Scene!":
+        event = random_event.generate_random_event()
+        return f"Scene Check: {result} ({die_roll})\n{event}"
+    if result == "Altered Scene!":
+        adjustment = _generate_scene_adjustment()
+        return f"Scene Check: {result} ({die_roll})\n{adjustment}"
+    
+    return f"Scene Check: {result} ({die_roll})"
 
-if __name__ == "__main__":
-    main()
+def _generate_scene_adjustment() -> str:
+    """Generate a scene adjustment."""
+    die_roll = random.randint(1, 10)
+    for pos, result in SCENE_ADJUSTMENT_TABLE:
+        if die_roll == pos:
+            return f"Scene Adjustment: {result}"
+    return "Scene Adjustment: Invalid Roll"  # Should never happen with 1-10 roll
+
+def _check_scene(chaos_factor: int, die_roll: int) -> str:
+    """Internal function to determine scene check result."""
+    if die_roll <= chaos_factor:
+        return "Interrupt Scene!" if die_roll % 2 == 0 else "Altered Scene!"
+    return "Normal Scene"

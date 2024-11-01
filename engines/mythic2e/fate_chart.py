@@ -1,4 +1,5 @@
 import random
+from engines.mythic2e import random_event
 
 FATE_CHART = [
     [[-1, 1, 81],[-1, 1, 81],[-1, 1, 81],[1, 5, 82],[2, 10, 83],[3, 15, 84],[5, 25, 86],[7, 35, 88],[10, 50, 91]],
@@ -55,6 +56,8 @@ def fate_check(chaos_factor, odds):
     # if a random event was generated, print it
     if randomEvent:
         result = result + '\n' + 'Random Event!'
+        event_result = random_event.generate_random_event()
+        result = result + '\n' + event_result
 
     return result
 

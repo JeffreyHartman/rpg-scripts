@@ -91,10 +91,18 @@ class ASCIIMenuBase(MenuBase):
     def display_result(self, result: str):
         """Displays a result in an attractive box."""
         box_width = min(60, self.width - 4)
-        result_box = self.ascii.create_box(box_width, 5)
-        result_lines = [result[i:i+box_width-4] for i in range(0, len(result), box_width-4)]
+        #result_box = self.ascii.create_box(box_width, 5)
+
+        initial_lines = result.split('\n')
+        result_lines = []
+        for line in initial_lines:
+            while line:
+                result_lines.append(line[:box_width-4])
+                line = line[box_width-4:]
         
-        for i, line in enumerate(result_lines[:3], 1):
+        result_box = self.ascii.create_box(box_width, len(result_lines) + 2)
+
+        for i, line in enumerate(result_lines, 1):
             padding = (box_width - len(line) - 2) // 2
             result_box[i] = f"│{' ' * padding}{line}{' ' * (box_width - len(line) - padding - 2)}│"
         

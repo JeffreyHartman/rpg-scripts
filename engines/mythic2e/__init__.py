@@ -6,3 +6,4 @@ from .random_event import (
     generate_npc,
     get_element_tables
 )
+from .scene_check import generate_scene_check

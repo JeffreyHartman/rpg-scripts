@@ -1,6 +1,6 @@
 # console/mythic2e_menu.py
 from .ascii_components import ASCIIMenuBase
-from engines.mythic2e import fate_chart, random_event
+from engines.mythic2e import fate_chart, random_event, scene_check
 from .ascii_components import ASCIIMenuBase
 
 class Mythic2eMenu(ASCIIMenuBase):
@@ -11,6 +11,7 @@ class Mythic2eMenu(ASCIIMenuBase):
             "3": "Scene Check",
             "4": "Descriptors",
             "5": "Elements",
+            "6": "Generate NPC",
             "C": "Change Game Engine",
             "S": "Settings",
             "Q": "Quit"
@@ -27,13 +28,18 @@ class Mythic2eMenu(ASCIIMenuBase):
             if choice == "1":
                 self.fate_check_menu()
             elif choice == "2":
-                self.random_event_menu()
+                result =random_event.generate_random_event()
+                self.display_result(result)
             elif choice == "3":
                 self.scene_check_menu()
             elif choice == "4":
-                self.descriptor_menu()
+                result = random_event.generate_descriptor()
+                self.display_result(result)
             elif choice == "5":
                 self.element_menu()
+            elif choice == "6":
+                result = random_event.generate_npc()
+                self.display_result(result)
     
     def fate_check_menu(self):
         try:
@@ -53,35 +59,23 @@ class Mythic2eMenu(ASCIIMenuBase):
             
         except ValueError:
             self.display_result("Invalid input. Please try again.")
-    
-    def random_event_menu(self):
-        options = {
-            "1": "Generate Random Event",
-            "2": "Generate Descriptor",
-            "3": "Generate Element",
-            "4": "Generate NPC",
-            "B": "Back"
-        }
-        
-        while True:
-            content = self.ascii.create_menu(options, self.width)
-            self.display_frame(content, "Random Event Generator")
+
+    def scene_check_menu(self):
+        try:
+            self.display_frame(
+                ["Enter Chaos Factor (current: {})".format(self.chaos_factor)],
+                "Scene Check"
+            )
             
-            choice = input("\nEnter your choice: ").upper()
+            chaos_input = input("\nChaos Factor: ").strip()
+            self.chaos_factor = int(chaos_input) if chaos_input else self.chaos_factor
             
-            if choice == "1":
-                result = random_event.generate_random_event()
-                self.display_result(result)
-            elif choice == "2":
-                result = random_event.generate_descriptor()
-                self.display_result(result)
-            elif choice == "3":
-                self.element_menu()
-            elif choice == "4":
-                result = random_event.generate_npc()
-                self.display_result(result)
-            elif choice == "B":
-                break
+            result = scene_check.generate_scene_check(self.chaos_factor)
+            
+            self.display_result(result)
+            
+        except ValueError:
+            self.display_result("Invalid input. Please try again.")
                 
     def element_menu(self):
         while True:
