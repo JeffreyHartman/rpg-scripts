@@ -89,11 +89,21 @@ class ASCIIMenuBase(MenuBase):
             print(line)
     
     def display_result(self, result: str):
-        """Displays a result in an attractive box."""
+        """Displays a result in an console box.
+        Can handle both string and dictionary results."""
         box_width = min(60, self.width - 4)
         #result_box = self.ascii.create_box(box_width, 5)
 
-        initial_lines = result.split('\n')
+        # Convert result to initial lines of text
+        if isinstance(result, dict):
+            initial_lines = []
+            for key, value in result.items():
+                initial_lines.append(f"{key}:")
+                initial_lines.append(f"  {value}")
+                initial_lines.append("─" * (box_width - 8))
+        else:
+            initial_lines = str(result).split('\n')
+
         result_lines = []
         for line in initial_lines:
             while line:

@@ -2,8 +2,13 @@
 from .ascii_components import ASCIIMenuBase
 from engines.mythic2e import fate_chart, random_event, scene_check
 from .ascii_components import ASCIIMenuBase
+from services.ai.openai_service import OpenAIService
 
 class Mythic2eMenu(ASCIIMenuBase):
+    def __init__(self):
+        super().__init__()
+        self.ai_service = OpenAIService()
+
     def display(self):
         options = {
             "1": "Fate Check",
@@ -38,8 +43,9 @@ class Mythic2eMenu(ASCIIMenuBase):
             elif choice == "5":
                 self.element_menu()
             elif choice == "6":
-                result = random_event.generate_npc()
-                self.display_result(result)
+                self.npc_menu()
+                # result = random_event.generate_npc()
+                # self.display_result(result)
     
     def fate_check_menu(self):
         try:
@@ -103,3 +109,13 @@ class Mythic2eMenu(ASCIIMenuBase):
                     self.display_result(f"Error generating element: {str(e)}")
             else:
                 self.display_result("Invalid choice. Please try again.")
+
+    def npc_menu(self):
+        npc_data = random_event.generate_npc()
+        self.display_result(npc_data)
+
+        print("\nWould you like an AI-generated description? (y/n)")
+        choice = input().strip().lower()
+        if choice == "y":
+            ai_description = self.ai_service.generate_npc_description(npc_data)
+            self.display_result(ai_description)

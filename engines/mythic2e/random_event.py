@@ -46,4 +46,4 @@ def generate_npc() -> dict[str, str]:
         'Identity', 'Description', 'Appearance', 'Background',
         'Personality', 'Motivation', 'Skills', 'Trait'
     ]
-    return {attr: generate_element(f'character{attr.lower()}.txt') for attr in npc_attributes}
+    return {attr: generate_element(f'character{attr.lower()}') for attr in npc_attributes}

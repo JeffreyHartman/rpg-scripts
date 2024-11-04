@@ -1,5 +1,5 @@
 import random
-import random_event
+from . import random_event
 
 SCENE_ADJUSTMENT_TABLE = [
     (1, "Remove a Character"),
