@@ -1,13 +1,12 @@
+from services.ai.base import AIService
 from typing import Dict
 from openai import OpenAI
-
-from .base import AIService
 
 class OpenAIService(AIService):
     def __init__(self):
         super().__init__()
-        self.client = OpenAI(api_key=self.config.get_api_key("openai"))
-        self.model = self.config.config["providers"]["openai"].get("model", "gpt-3.5-turbo")
+        self.client = OpenAI(api_key=self.settings.get_api_key("openai"))
+        self.model = self.settings.get_ai_model("openai")
 
     def generate_npc_description(self, npc_data: Dict[str, str]) -> str:
         theme_context = self._get_theme_prompt()

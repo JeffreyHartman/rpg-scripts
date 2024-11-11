@@ -1,4 +1,4 @@
-- Refactor console UI to use rich
+X Refactor console UI to use rich
 - Add other ai models from open ai
 - Add support for Claude
 - Add AI prompting for all random table generation

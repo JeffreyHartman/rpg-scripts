@@ -29,3 +29,7 @@ class IOHandler(ABC):
     @abstractmethod
     def display_message(self, message: str):
         pass
+    
+    @abstractmethod
+    def wait_for_input(self):
+        pass

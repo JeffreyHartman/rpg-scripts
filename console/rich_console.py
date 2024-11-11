@@ -42,9 +42,19 @@ class RichConsoleImpl(IOHandler):
             box=box.DOUBLE,
         )
 
-        # Content panel
+        # Content panel - handle different types of content
+        if isinstance(content, (Table, Panel)):
+            # Single renderable object
+            content_to_display = content
+        elif isinstance(content, str):
+            # String content - convert to Text with markup
+            content_to_display = Text.from_markup(content)
+        else:
+            # Assume it's an iterable of renderables
+            content_to_display = Group(*content)
+
         content_panel = Panel(
-            content if isinstance(content, (Table, Panel)) else Group(*content),
+            content_to_display,
             width=self.width,
             box=box.ROUNDED,
         )
@@ -92,7 +102,7 @@ class RichConsoleImpl(IOHandler):
             )
 
         self.console.print(content)
-        self.console.input("\nPress Enter to continue...")
+        self.wait_for_input()
 
     def display_input_prompt(self, promt: str) -> str:
         return self.console.input(promt)
@@ -102,3 +112,6 @@ class RichConsoleImpl(IOHandler):
 
     def display_message(self, message: str):
         self.console.print(message)
+        
+    def wait_for_input(self):
+        self.console.input("\nPress Enter to continue...")
