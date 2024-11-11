@@ -1,9 +1,31 @@
 X Refactor console UI to use rich
-- Add other ai models from open ai
+X Add other ai models from open ai
 - Add support for Claude
+- Refactor Random Event to allow for different meaning tables
+    - Pause after meaning table roll and prompt for user to pick element meaning tables (default to action for quick selection)
+- Add context prompts for Fate Questions, Scene Checks, and Random Events
+- Add 
+- Better formatting of Element tables into 2 or 3 columns
 - Add AI prompting for all random table generation
 - Data Management
-    - Save/Load NPC and Thread lists
     - Create and save campaigns with session journals
+    - Save NPC and Thread lists
+    - Roll randomly on NPC and Thread lists and add them to proper event checks
     - Save log of generated content
+- Send recent history to AI prompts for context (make optional somehow, just a y/n question? For future GUI, display recent context with checkboxes) 
 - Random loot tables for various systems
+- Allow customization of AI prompts so the user can tailor the AI to their preferences
+- Add more Mythic 2e stuff from the Mythic Magazine!
+- Add support for other systems
+    - (UNE) Universal NPC Emulator
+    - Ironsworn
+    - Mythic Adventure Crafter
+    - Sandbox Generator
+        - Create hex crawl maps?
+    - Four Against Darkness
+        - Create dungeon crawl maps?
+    - Custom menu creator
+        - Ability to mix and match abilities from different systems to create your own mishmash
+- Create a GUI interface
+- Custom workflows?
+    
