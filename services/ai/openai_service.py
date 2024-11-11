@@ -13,22 +13,31 @@ class OpenAIService(AIService):
         theme_context = self._get_theme_prompt()
 
         prompt = f"""
-        Create a brief, one-paragraph description (maximum 3 sentences) for a quick NPC encounter {theme_context}.
+        Based on the following character attributes, create detailed GM notes for an NPC {theme_context}.
+        Interpret each trait with a sentence and then integrate them into a cohesive and interesting character background.
         The character has the following attributes:
         """
 
         for trait, value in npc_data.items():
             prompt += f"{trait}: {value}\n"
 
-        prompt += "\nWrite a narrative paragraph describing this character, their appearance, personality, and notable features. Focus on making them memorable and interesting."
+        prompt += "\nWrite in the style of GM notes, focusing on how these traits define the character's background, motivations, and potential interactions."
 
         try:
-            repsonse = self.client.chat.completions.create(model=self.model,
-            messages=[
-                {"role": "system", "content": "You are a concise RPG GM assistant. Keep all NPC descriptions brief and focused on essential details only. Avoid flowery language and extensive backstory."},
-                {"role": "user", "content": prompt}
-            ])
-
+            repsonse = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are an RPG Game Master assistant tasked with creating detailed and engaging NPC backgrounds. "
+                            "Interpret each provided trait and weave them into a cohesive narrative that can aid the GM in role-playing this character. "
+                            "Avoid addressing the player directly; focus on providing notes for the GM."
+                        ),
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+            )
             return repsonse.choices[0].message.content
         except Exception as e:
             return f"Error generating description: {str(e)}"

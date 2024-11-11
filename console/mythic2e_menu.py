@@ -1,13 +1,14 @@
 # console/mythic2e_menu.py
-from .ascii_components import ASCIIMenuBase
+from .menu_base import MenuBase
 from engines.mythic2e import fate_chart, random_event, scene_check
-from .ascii_components import ASCIIMenuBase
 from services.ai.openai_service import OpenAIService
+from .io_handler import IOHandler
 
-class Mythic2eMenu(ASCIIMenuBase):
-    def __init__(self):
-        super().__init__()
+class Mythic2eMenu(MenuBase):
+    def __init__(self, io_handler: IOHandler):
+        super().__init__(io_handler)
         self.ai_service = OpenAIService()
+        self.chaos_factor = 5  # Default chaos factor
 
     def display(self):
         options = {
@@ -17,29 +18,33 @@ class Mythic2eMenu(ASCIIMenuBase):
             "4": "Descriptors",
             "5": "Elements",
             "6": "Generate NPC",
+        }
+        system_options = {
             "C": "Change Game Engine",
             "S": "Settings",
             "Q": "Quit"
         }
         
         while True:
-            content = self.ascii.create_menu(options, self.width)
-            self.display_frame(content, "Mythic 2e Game Master Emulator")
+            options_table = self.io_handler.display_menu(options, "Game Options")
+            system_table = self.io_handler.display_menu(system_options, "System Options")
+            content = [options_table, system_table]
+            self.io_handler.display_frame(content, "Mythic 2e Game Master Emulator")
             
-            choice = input("\nEnter your choice: ").upper()
-            if self.handle_input(choice, options):
+            choice = self.io_handler.display_input_prompt("\nEnter your choice: ").strip().upper()
+            if self.handle_input(choice, {**options, **system_options}):
                 continue
             
             if choice == "1":
                 self.fate_check_menu()
             elif choice == "2":
                 result =random_event.generate_random_event()
-                self.display_result(result)
+                self.io_handler.display_result(result)
             elif choice == "3":
                 self.scene_check_menu()
             elif choice == "4":
                 result = random_event.generate_descriptor()
-                self.display_result(result)
+                self.io_handler.display_result(result)
             elif choice == "5":
                 self.element_menu()
             elif choice == "6":
@@ -49,39 +54,37 @@ class Mythic2eMenu(ASCIIMenuBase):
     
     def fate_check_menu(self):
         try:
-            self.display_frame(
-                ["Enter Chaos Factor (current: {})".format(self.chaos_factor),
-                 "Enter odds (1-10, default 5)"],
-                "Fate Check"
-            )
+            content = [
+                f"Enter Chaos Factor (current: {self.chaos_factor})",
+                "Enter odds (1-10, default 5)"
+            ]
+            self.io_handler.display_frame(content, "Fate Check")
             
-            chaos_input = input("\nChaos Factor: ").strip()
+            chaos_input = self.io_handler.display_input_prompt("\nChaos Factor: ").strip()
             self.chaos_factor = int(chaos_input) if chaos_input else self.chaos_factor
             
-            odds = int(input("Odds: ").strip() or "5")
+            odds_input = self.io_handler.display_input_prompt("Odds: ").strip()
+            odds = int(odds_input) if odds_input else 5            
             result = fate_chart.fate_check(self.chaos_factor, odds)
-            
-            self.display_result(result)
+            self.io_handler.display_result(result)
             
         except ValueError:
-            self.display_result("Invalid input. Please try again.")
+            self.io_handler.display_error("Invalid input. Please try again.")
 
     def scene_check_menu(self):
         try:
-            self.display_frame(
-                ["Enter Chaos Factor (current: {})".format(self.chaos_factor)],
-                "Scene Check"
-            )
+            content = [f"Enter Chaos Factor (current: {self.chaos_factor})"]
+            self.io_handler.display_frame(content, "Scene Check")
+
             
-            chaos_input = input("\nChaos Factor: ").strip()
+            chaos_input = self.io_handler.display_input_prompt("\nChaos Factor: ").strip()
             self.chaos_factor = int(chaos_input) if chaos_input else self.chaos_factor
-            
+
             result = scene_check.generate_scene_check(self.chaos_factor)
-            
-            self.display_result(result)
+            self.io_handler.display_result(result)
             
         except ValueError:
-            self.display_result("Invalid input. Please try again.")
+            self.io_handler.display_error("Invalid input. Please try again.")
                 
     def element_menu(self):
         while True:
@@ -91,11 +94,10 @@ class Mythic2eMenu(ASCIIMenuBase):
             options = {str(i): element for i, element in enumerate(elements, start=1)}
             options["0"] = "Back"
             
-            # Display the menu
-            content = self.ascii.create_menu(options, self.width)
-            self.display_frame(content, "Element Generator")
-            
-            choice = input("\nEnter your choice: ").strip()
+            content = self.io_handler.display_menu(options, "Element Generator")
+            self.io_handler.display_frame(content, "Element Generator")
+        
+            choice = self.io_handler.display_input_prompt("\nEnter your choice: ").strip()
             
             if choice == "0":
                 break
@@ -104,18 +106,18 @@ class Mythic2eMenu(ASCIIMenuBase):
                     # Generate the selected element type
                     element_type = options[choice]
                     result = random_event.generate_element(element_type)
-                    self.display_result(result)
+                    self.io_handler.display_result(result)
                 except Exception as e:
-                    self.display_result(f"Error generating element: {str(e)}")
+                    self.io_handler.display_error(f"Error generating element: {str(e)}")
             else:
-                self.display_result("Invalid choice. Please try again.")
-
+                self.io_handler.display_error("Invalid choice. Please try again.")
+                
     def npc_menu(self):
         npc_data = random_event.generate_npc()
-        self.display_result(npc_data)
+        self.io_handler.display_result(npc_data)
 
-        print("\nWould you like an AI-generated description? (y/n)")
-        choice = input().strip().lower()
+        choice = self.io_handler.display_input_prompt("\nWould you like an AI-generated description? (y/n): ").strip().lower()
         if choice == "y":
             ai_description = self.ai_service.generate_npc_description(npc_data)
-            self.display_result(ai_description)
+            self.io_handler.display_result(ai_description)
+        

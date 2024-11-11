@@ -1,0 +1,9 @@
+- Refactor console UI to use rich
+- Add other ai models from open ai
+- Add support for Claude
+- Add AI prompting for all random table generation
+- Data Management
+    - Save/Load NPC and Thread lists
+    - Create and save campaigns with session journals
+    - Save log of generated content
+- Random loot tables for various systems

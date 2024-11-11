@@ -5,7 +5,7 @@
       "name": "Python: RPG Scripts",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/console/rpg-scripts.py",
+      "program": "${workspaceFolder}/rpg-scripts.py",
       "console": "integratedTerminal"
     }
   ]
