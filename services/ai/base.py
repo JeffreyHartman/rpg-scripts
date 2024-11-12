@@ -24,6 +24,7 @@ class AIService(ABC):
     def _build_character_prompt(self, npc_data: Dict[str, str]) -> str:
         prompt = f"""
         Based on the following character attributes, create detailed GM notes for an NPC {self._get_theme_prompt()}.
+        For each trait section in your output, reiterate the attribute and what was rolled for it.
         Interpret each trait with a sentence and then integrate them into a cohesive and interesting character background.
         The character has the following attributes:
         """

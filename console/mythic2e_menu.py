@@ -1,13 +1,11 @@
 # console/mythic2e_menu.py
 from .menu_base import MenuBase
 from engines.mythic2e import fate_chart, random_event, scene_check
-from services.ai.openai_service import OpenAIService
 from .io_handler import IOHandler
 
 class Mythic2eMenu(MenuBase):
     def __init__(self, io_handler: IOHandler):
         super().__init__(io_handler)
-        self.ai_service = OpenAIService()
         self.chaos_factor = 5  # Default chaos factor
 
     def display(self):

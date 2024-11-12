@@ -1,6 +1,7 @@
 X Refactor console UI to use rich
 X Add other ai models from open ai
 - Add support for Claude
+- Add logging support
 - Refactor Random Event to allow for different meaning tables
     - Pause after meaning table roll and prompt for user to pick element meaning tables (default to action for quick selection)
 - Add context prompts for Fate Questions, Scene Checks, and Random Events

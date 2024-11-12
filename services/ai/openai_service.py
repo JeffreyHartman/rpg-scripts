@@ -5,6 +5,7 @@ from openai import OpenAI
 class OpenAIService(AIService):
     def __init__(self):
         super().__init__()
+        self.provider = "openai"
         self.client = OpenAI(api_key=self.settings.get_api_key("openai"))
         active_model = self.settings.get_active_model()
         self.model = self.settings.get_model_name_from_full(active_model)

@@ -3,11 +3,14 @@ from console.io_handler import IOHandler
 from abc import ABC, abstractmethod
 from config.settings import Settings
 import sys
+from services.ai.manager import AIServiceManager
 
 class MenuBase(ABC):
     def __init__(self, io_handler: IOHandler):
         self.settings = Settings()
         self.io_handler = io_handler
+        self.ai_manager = AIServiceManager()
+        self.ai_service = self.ai_manager.get_service()
 
     @abstractmethod
     def display(self):
@@ -154,7 +157,7 @@ class MenuBase(ABC):
         
         # Create numbered options for available models
         options = {str(i): f"{model}: {desc}" for i, (model, desc) in enumerate(available_models.items(), 1)}
-        options["0"] = "Back"
+        options["B"] = "Back"
         
         # Display current model
         current_model = self.settings.get_active_model()
@@ -170,6 +173,7 @@ class MenuBase(ABC):
         elif choice in options:
             model_key = list(available_models.keys())[int(choice) - 1]
             self.settings.set_active_model(model_key)
+            self.ai_service = self.ai_manager.get_service()
             self.io_handler.display_message(f"Model set to: {model_key}")
         else:
             self.io_handler.display_error("Invalid choice")
