@@ -35,46 +35,26 @@ class MenuBase(ABC):
         menu_content = self.io_handler.display_menu(options, title)
         return menu_content
 
-    # def settings_menu(self):
-    #     while True:
-    #         options = {
-    #             "1": "AI Settings",
-    #             "B": "Back",
-    #         }
-
-    #         # Use the io_handler to display the menu
-    #         content = self.io_handler.display_menu(options, "Settings Menu")
-    #         self.io_handler.display_frame(content, "Settings")
-
-    #         choice = self.io_handler.display_input_prompt("\nEnter your choice: ").strip().upper()
-
-    #         if choice == "1":
-    #             self.ai_settings_menu()
-    #         elif choice == "B":
-    #             break
-    #         else:
-    #             self.io_handler.display_error("Invalid choice. Please try again.")
-
     def settings_menu(self):
         while True:
             options = {
-                "1": "Set OpenAI API Key",
-                "2": "Set Theme",
-                "3": "Set AI Model",
+                "1": "Set AI Model",
+                "2": "Manage API Keys",
+                "3": "Set Theme",
                 "4": "View Current Settings",
                 "B": "Back",
             }
 
-            content = self.io_handler.display_menu(options, "AI Settings Menu")
-            self.io_handler.display_frame(content, "AI Settings")
+            content = self.io_handler.display_menu(options, " Settings Menu")
+            self.io_handler.display_frame(content, "Settings")
             choice = self.io_handler.display_input_prompt("\nEnter your choice: ").strip().upper()
 
             if choice == "1":
-                self._set_api_key_menu()
-            elif choice == "2":
-                self._set_theme_menu()
-            elif choice == "3":
                 self._set_model_menu()
+            elif choice == "2":
+                self._manage_api_keys_menu() 
+            elif choice == "3":
+                self._set_theme_menu()
             elif choice == "4":
                 self._display_current_settings()
             elif choice == "B":
@@ -101,10 +81,32 @@ class MenuBase(ABC):
         else:
             self.io_handler.display_error("Invalid choice")
 
-    def _set_api_key_menu(self):
+    def _manage_api_keys_menu(self):
+        while True:
+            options = {
+                "1": "Set OpenAI API Key",
+                "2": "Set Anthropic API Key",
+                "0": "Back"
+            }
+
+            content = self.io_handler.display_menu(options, "API Keys Management")
+            self.io_handler.display_frame(content, "Manage API Keys")
+            choice = self.io_handler.display_input_prompt("\nEnter your choice: ").strip()
+
+            if choice == "1":
+                self._set_openai_key()
+            elif choice == "2":
+                self._set_anthropic_key()
+            elif choice == "0":
+                break
+            else:
+                self.io_handler.display_error("Invalid choice. Please try again.")
+
+    def _set_openai_key(self):
         self.io_handler.display_frame("", "Set OpenAI API Key")
         self.io_handler.display_message("\nEnter your OpenAI API key (leave blank to keep current):")
         self.io_handler.display_message("You can get this from https://platform.openai.com/account/api-keys")
+        
         current_key = self.settings.get_api_key("openai")
         if current_key:
             self.io_handler.display_message(f"Current API key: {current_key}")
@@ -112,7 +114,22 @@ class MenuBase(ABC):
         new_key = self.io_handler.display_input_prompt("New API key (leave blank to keep current): ").strip()
         if new_key:
             self.settings.set_api_key("openai", new_key)
-            self.io_handler.display_message("API key set successfully")
+            self.io_handler.display_message("OpenAI API key set successfully")
+        self.io_handler.wait_for_input()
+
+    def _set_anthropic_key(self):
+        self.io_handler.display_frame("", "Set Anthropic API Key")
+        self.io_handler.display_message("\nEnter your Anthropic API key (leave blank to keep current):")
+        self.io_handler.display_message("You can get this from https://console.anthropic.com/settings/keys")
+        
+        current_key = self.settings.get_api_key("anthropic")
+        if current_key:
+            self.io_handler.display_message(f"Current API key: {current_key}")
+
+        new_key = self.io_handler.display_input_prompt("New API key (leave blank to keep current): ").strip()
+        if new_key:
+            self.settings.set_api_key("anthropic", new_key)
+            self.io_handler.display_message("Anthropic API key set successfully")
         self.io_handler.wait_for_input()
 
     def _set_theme_menu(self):
@@ -133,16 +150,15 @@ class MenuBase(ABC):
             self.io_handler.display_error("Invalid choice")
             
     def _set_model_menu(self):
-        provider = "openai"  # For now, hardcode to OpenAI
-        available_models = self.settings.get_available_models(provider)
+        available_models = self.settings.get_available_models()
         
         # Create numbered options for available models
-        options = {str(i): model for i, model in enumerate(available_models, 1)}
+        options = {str(i): f"{model}: {desc}" for i, (model, desc) in enumerate(available_models.items(), 1)}
         options["0"] = "Back"
         
         # Display current model
-        current_model = self.settings.get_ai_model(provider)
-        self.io_handler.display_message(f"\nCurrent model: {current_model}")
+        current_model = self.settings.get_active_model()
+        self.io_handler.display_message(f"\nCurrent model: {current_model or 'Not Set'}")
         
         # Display menu
         content = self.io_handler.display_menu(options, "Select AI Model")
@@ -152,21 +168,27 @@ class MenuBase(ABC):
         if choice == "0":
             return
         elif choice in options:
-            self.settings.set_ai_model(provider, options[choice])
-            self.io_handler.display_message(f"Model set to: {options[choice]}")
+            model_key = list(available_models.keys())[int(choice) - 1]
+            self.settings.set_active_model(model_key)
+            self.io_handler.display_message(f"Model set to: {model_key}")
         else:
             self.io_handler.display_error("Invalid choice")
         
     def _display_current_settings(self):
+        available_models = self.settings.get_available_models()
         theme = self.settings.get_theme()
-        key = self.settings.get_api_key("openai")
-        key_display = key if key else "Not Set"
+        current_model = self.settings.get_active_model()
+        model_description = available_models[current_model] if current_model else "Not Set"
 
         content = f"""[bold]Current Settings:[/bold]
-    
+
     - Theme: {theme}
-    - AI Model: {self.settings.get_ai_model("openai")}
-    - OpenAI API Key: {key_display}"""
+    - AI Model: {current_model}
+      Description: {model_description}
+
+    [bold]API Keys:[/bold]
+    - OpenAI: {'Set' if self.settings.get_api_key('openai') else 'Not Set'}
+    - Anthropic: {'Set' if self.settings.get_api_key('anthropic') else 'Not Set'}"""
 
         self.io_handler.display_frame(content, "Current Settings")
         self.io_handler.wait_for_input()
