@@ -1,11 +1,10 @@
 X Refactor console UI to use rich
 X Add other ai models from open ai
-- Add support for Claude
-- Add logging support
+X Add support for Claude
+X Add logging support
 - Refactor Random Event to allow for different meaning tables
     - Pause after meaning table roll and prompt for user to pick element meaning tables (default to action for quick selection)
 - Add context prompts for Fate Questions, Scene Checks, and Random Events
-- Add 
 - Better formatting of Element tables into 2 or 3 columns
 - Add AI prompting for all random table generation
 - Data Management
@@ -27,6 +26,7 @@ X Add other ai models from open ai
         - Create dungeon crawl maps?
     - Custom menu creator
         - Ability to mix and match abilities from different systems to create your own mishmash
+- Make a discord bot
 - Create a GUI interface
 - Custom workflows?
     

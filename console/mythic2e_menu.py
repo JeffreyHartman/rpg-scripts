@@ -2,13 +2,16 @@
 from .menu_base import MenuBase
 from engines.mythic2e import fate_chart, random_event, scene_check
 from .io_handler import IOHandler
+from services.logging.logger_interface import LoggerInterface
 
 class Mythic2eMenu(MenuBase):
-    def __init__(self, io_handler: IOHandler):
+    def __init__(self, io_handler: IOHandler, logger: LoggerInterface):
+        self.logger = logger
         super().__init__(io_handler)
         self.chaos_factor = 5  # Default chaos factor
 
     def display(self):
+        self.logger.info("Displaying Mythic 2e Menu")
         options = {
             "1": "Fate Check",
             "2": "Random Event",
